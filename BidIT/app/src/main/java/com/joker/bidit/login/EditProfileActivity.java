@@ -24,9 +24,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.joker.bidit.R;
+import com.joker.bidit.dashboard.Product;
 import com.joker.bidit.navigationDrawer.NavigationDrawerActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class EditProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -91,11 +93,17 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
-    private void userInformation(){
+    private void userInformation() {
         String name = editTextName.getText().toString().trim();
         String surname = editTextSurname.getText().toString().trim();
         String phoneNo = editTextPhoneNo.getText().toString().trim();
-        UserInformation userinformation = new UserInformation(name, surname, phoneNo);
+        ArrayList<Product> products = new ArrayList<>();
+
+        UserInformation userinformation = UserInformation.getInstance();
+        userinformation.setName(name);
+        userinformation.setSurname(surname);
+        userinformation.setPhoneNo(phoneNo);
+        userinformation.setProducts(products);
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
         databaseReference.child(user.getUid()).setValue(userinformation);

@@ -2,6 +2,7 @@ package com.joker.bidit.navigationDrawer.ui.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +14,23 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.joker.bidit.R;
 import com.joker.bidit.addProduct.AddProductActivity;
 import com.joker.bidit.dashboard.Product;
 import com.joker.bidit.dashboard.ProductAdaptor;
 import com.joker.bidit.dashboard.ProductsClickListener;
 import com.joker.bidit.dashboard.RecyclerTouchListener;
+import com.joker.bidit.login.UserInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +79,7 @@ public class HomeFragment extends Fragment {
             mProducts.get(HomeFragment.POSITION).setColour(AddProductActivity.updated_color);
             mProducts.get(HomeFragment.POSITION).setPrice(parseDouble(AddProductActivity.updated_price));
             mProducts.get(HomeFragment.POSITION).setWeight(parseDouble(AddProductActivity.updated_weight));
+            mProducts.get(HomeFragment.POSITION).setPicture(AddProductActivity.updated_image);
 
             adapter.notifyDataSetChanged();
 
@@ -75,18 +87,53 @@ public class HomeFragment extends Fragment {
         }
         else {
             if (AddProductActivity.ADD_NEW_PRODUCT == 1 && AddProductActivity.pressSaveButton == 1) {
-                // TODO - select imagine
                 Product new_product = new Product(AddProductActivity.updated_color,
-                        parseDouble(AddProductActivity.updated_weight),
-                        AddProductActivity.updated_name,
-                        parseDouble(AddProductActivity.updated_price),
-                        "https://images.unsplash.com/photo-1514192631-251f5f0b14f2?w=800&q=60");
+                                                parseDouble(AddProductActivity.updated_weight),
+                                                AddProductActivity.updated_name,
+                                                parseDouble(AddProductActivity.updated_price),
+                                                AddProductActivity.updated_image);
+
+                Toast.makeText(context, "IF ADD PRODUCT", Toast.LENGTH_LONG).show();
+
                 mProducts.add(new_product);
                 adapter.notifyDataSetChanged();
+
+                sendUserData(AddProductActivity.updated_name, AddProductActivity.updated_image);
+
+                UserInformation.getInstance().setProducts(mProducts);
+                userInformation();
 
                 AddProductActivity.ADD_NEW_PRODUCT = 0;
             }
         }
+    }
+
+    private void userInformation() {
+
+        UserInformation userinformation = UserInformation.getInstance();
+
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        databaseReference.child(user.getUid()).setValue(userinformation);
+        Toast.makeText(getContext(),"User information updated" + userinformation.getProducts().size(),
+                Toast.LENGTH_LONG).show();
+    }
+
+    private void sendUserData(String name, String image) {
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageReference = firebaseStorage.getReference();
+
+        // Get "User UID" from Firebase > Authentication > Users.
+        DatabaseReference databaseReference = firebaseDatabase.getReference(firebaseAuth.getUid());
+        //User id/Images/name
+        StorageReference imageReference = storageReference.child(firebaseAuth.getUid()).child("Images").child(name);
+        UploadTask uploadTask = imageReference.putFile(Uri.parse(image));
+        uploadTask.addOnFailureListener(e -> Toast.makeText(context, "Error: Uploading picture", Toast.LENGTH_SHORT).show())
+                .addOnSuccessListener(taskSnapshot -> Toast.makeText(context, "Picture uploaded", Toast.LENGTH_SHORT).show());
     }
 
     private void populateRecyclerView() {
@@ -117,10 +164,10 @@ public class HomeFragment extends Fragment {
                 String photo = product.getPicture();
                 String price = product.getPrice().toString();
 
-//                Toast.makeText(context, getString(R.string.single_click) + message,
-//                        Toast.LENGTH_SHORT).show();
-
                 POSITION = position;
+
+                Toast.makeText(context, getString(R.string.single_click) + position + photo,
+                        Toast.LENGTH_SHORT).show();
 
                 Intent secondActivity = new Intent(adapter.getContext(), AddProductActivity.class);
                 secondActivity.putExtra(HomeFragment.NAME, name);
@@ -141,38 +188,30 @@ public class HomeFragment extends Fragment {
 
     private void getProducts() {
         mProducts = new ArrayList<>();
-        Product product1 = new Product("red", 3.0, "Book", 200,
-                "https://images.unsplash.com/photo-1510546462255-979b0e0ca1b5?w=800&q=60");
-        Product product2 = new Product("pink", 2.0, "Scarf", 20,
-                "https://images.unsplash.com/photo-1514207994142-98522b5a2b23?w=800&q=60");
-        Product product3 = new Product("blue", 5.0, "T-shirt", 160,
-                "https://images.unsplash.com/photo-1512909481869-0eaa1e9817ba?w=800&q=60");
-//        Product product4 = new Product("white", 1.0, "Scarf", 80,
-//                "https://images.unsplash.com/photo-1514192631-251f5f0b14f2?w=800&q=60");
-//        Product product5 = new Product("green", 2.0, "Book", 250,
-//                "https://images.unsplash.com/photo-1519894520384-1ee1adbe7bd8?w=800&q=60");
-//        Product product6 = new Product("yellow", 1.5, "Toy car", 400,
-//                "https://images.unsplash.com/photo-1511837008003-71eca36ceb70?w=800&q=60");
-//        Product product7 = new Product("blue", 1.5, "Chocolate", 560,
-//                "https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=800&q=60");
-//        Product product8 = new Product("magenta", 1.5, "Phone", 530,
-//                "https://images.unsplash.com/photo-1480717846107-87837abec1e9?w=800&q=60");
-//        Product product9 = new Product("black", 3.5, "Blazer", 520,
-//                "https://images.unsplash.com/photo-1513796430146-c91cf8e4d65c?w=800&q=60");
-//        Product product10 = new Product("orange", 7.0, "Shoes", 720,
-//                "https://images.unsplash.com/photo-1480632563560-30f503c09195?w=800&q=60");
 
-        mProducts.add(product1);
-        mProducts.add(product2);
-        mProducts.add(product3);
-//        mProducts.add(product4);
-//        mProducts.add(product5);
-//        mProducts.add(product6);
-//        mProducts.add(product7);
-//        mProducts.add(product8);
-//        mProducts.add(product9);
-//        mProducts.add(product10);
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = firebaseDatabase.getReference(firebaseAuth.getUid());
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UserInformation userProfile = dataSnapshot.getValue(UserInformation.class);
+                List<Product> products = userProfile.getProducts();
+                if (products != null) {
+                    mProducts.addAll(products);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(context, databaseError.getCode(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Toast.makeText(context, "Size = " + mProducts.size(),
+                Toast.LENGTH_LONG).show();
     }
-
-
 }

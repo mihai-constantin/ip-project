@@ -66,23 +66,23 @@ public class GetInfoActivity extends AppCompatActivity {
                 Picasso.get().load(uri).fit().centerInside().into(mImageViewUser);
             });
 
-            final FirebaseUser user = firebaseAuth.getCurrentUser();
-            databaseReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    UserInformation userProfile = dataSnapshot.getValue(UserInformation.class);
-                    mTextViewUserName.setText(userProfile.getUserName());
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UserInformation userProfile = dataSnapshot.getValue(UserInformation.class);
+                mTextViewUserName.setText(userProfile.getUserName());
 //                profileSurnameTextView.setText(userProfile.getUserSurname());
-                    mTextViewPhoneNo.setText(userProfile.getUserPhoneNo());
-                    mTextViewEmailUser.setText(user.getEmail());
-                }
+                mTextViewPhoneNo.setText(userProfile.getUserPhoneNo());
+                mTextViewEmailUser.setText(user.getEmail());
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(GetInfoActivity.this, databaseError.getCode(),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(GetInfoActivity.this, databaseError.getCode(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
         }
     }
 
