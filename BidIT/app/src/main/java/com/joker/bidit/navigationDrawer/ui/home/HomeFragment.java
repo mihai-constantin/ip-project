@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.UserInfo;
 import com.joker.bidit.R;
 import com.joker.bidit.addProduct.AddProductActivity;
 import com.joker.bidit.dashboard.Product;
@@ -22,7 +21,6 @@ import com.joker.bidit.dashboard.ProductsClickListener;
 import com.joker.bidit.dashboard.RecyclerTouchListener;
 import com.joker.bidit.login.UserInformation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Double.parseDouble;
@@ -38,7 +36,7 @@ public class HomeFragment extends Fragment {
 
     View root;
 
-    private List<Product> mProducts;
+    private List<Product> mProducts = UserInformation.getInstance().getProducts();
     private RecyclerView recyclerViewProducts;
     private ProductAdaptor adapter;
 
@@ -49,12 +47,6 @@ public class HomeFragment extends Fragment {
 
         root = inflater.inflate(R.layout.activity_products, container, false);
         context = getActivity();
-
-        if (UserInformation.getInstance() == null)
-            mProducts = new ArrayList<>();
-        else
-            mProducts = UserInformation.getInstance().getProducts();
-
         populateRecyclerView();
 
         return root;

@@ -165,6 +165,7 @@ public class AddProductActivity extends AppCompatActivity {
             updated_color = productColorEditText.getText().toString();
             updated_weight = productWeightEditText.getText().toString();
             updated_price = Integer.toString(seek_bar.getProgress());
+
             ADD_NEW_PRODUCT = 0;
         }
         else {

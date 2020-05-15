@@ -63,6 +63,7 @@ public class ViewProductActivity extends AppCompatActivity {
         //String photo = intent.getStringExtra(GalleryFragment.PHOTO_URL);
         price = intent.getStringExtra(GalleryFragment.PRICE);
 
+
         initView();
 
         if (price != null) {
