@@ -92,6 +92,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
             mTextViewUserName.setText(username);
             mTextViewEmailUser.setText(email);
 
+            // COMENTARIU
             Picasso.get()
                     .load(photo)
                     .resize(300,300)
